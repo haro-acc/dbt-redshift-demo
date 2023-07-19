@@ -24,6 +24,15 @@ listings as (
 
 ),
 
+
+median_tickets as (
+
+    select event_id, -1 AS median_tickets_per_event
+      from {{ ref('stg_tickit__listings') }}
+     group by event_id
+
+), 
+
 sales as (
 
     select * from {{ ref('stg_tickit__sales') }}
@@ -76,7 +85,8 @@ final as (
         s.price_paid,
         s.commission_prcnt,
         s.commission,
-        s.earnings
+        s.earnings,
+        median_tickets.median_tickets_per_event
     from 
         sales as s
             join listings as l on l.list_id = s.list_id
@@ -84,6 +94,7 @@ final as (
             join sellers as se on se.user_id = s.seller_id
             join event_categories as ec on ec.event_id = s.event_id
             join dates as d on d.date_id = s.date_id
+            join median_tickets on ec.event_id = median_tickets.event_id
     order by
         sale_id
 )
