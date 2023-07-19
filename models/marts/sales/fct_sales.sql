@@ -24,6 +24,7 @@ listings as (
 
 ),
 
+
 sales as (
 
     select * from {{ ref('stg_tickit__sales') }}
